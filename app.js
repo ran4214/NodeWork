@@ -9,10 +9,10 @@ mongoose.connect(process.env.MONGO_DB);
 var db = mongoose.connection;
 db.once("open",function(){
   console.log('DB CONNECTED!');
-})
+});
 db.on("error",function(err){
   console.log('DB ERROR : '+ err);
-})
+});
 
 var dataSchema = mongoose.Schema({
   name : String,
@@ -44,16 +44,34 @@ app.get('/',function(req,res){
   });
 });
 app.get('/reset',function(req,res){
-  data.count = 0;
-  res.render('myejs',data);
+  Data.findOne({name:"myData"},function(err,data){
+    if(err) return console.log("Data Error:",err);
+    data.count = 0;
+    data.save(function(err){
+      if(err) return console.log("Data Error:",err);
+      res.render('myejs',data);
+    });
+  });
 });
 app.get('/set/count',function(req,res){
-  if(req.query.count) data.count = req.query.count;
-  res.render('myejs',data);
+  Data.findOne({name:"myData"},function(err,data){
+    if(err) return console.log("Data Error:",err);
+    if(req.query.count) data.count = req.query.count;
+    data.save(function(err){
+      if(err) return console.log("Data Error:",err);
+      res.render('myejs',data);
+    });
+  });
 });
 app.get('/set/:num',function(req,res){
-  data.count  = req.params.num;
-  res.render('myejs',data);
+  Data.findOne({name:"myData"},function(err,data){
+    if(err) return console.log("Data Error:",err);
+    data.count = req.params.num;
+    data.save(function(err){
+      if(err) return console.log("Data Error:",err);
+      res.render('myejs',data);
+    });
+  });
 });
 
 app.listen(3000, function() {
